@@ -1,0 +1,224 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// ===========================
+// ENUMS
+// ===========================
+
+enum AuthProvider {
+  GOOGLE
+  DISCORD
+  EMAIL
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum MatchPhase {
+  GROUPS
+  R32
+  R16
+  QUARTER_FINAL
+  SEMI_FINAL
+  THIRD_PLACE
+  FINAL
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  POSTPONED
+}
+
+enum MatchResult {
+  HOME
+  AWAY
+  DRAW
+}
+
+enum PredictionPick {
+  HOME
+  AWAY
+  DRAW
+}
+
+enum BonusType {
+  CHAMPION
+  RUNNER_UP
+  THIRD_PLACE
+  TOP_SCORER
+  BEST_PLAYER
+}
+
+// ===========================
+// MODELS
+// ===========================
+
+model User {
+  id         String       @id @default(cuid())
+  email      String       @unique
+  name       String
+  image      String?
+  provider   AuthProvider @default(EMAIL)
+  providerId String?
+  role       Role         @default(USER)
+  isActive   Boolean      @default(true)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  predictions      Prediction[]
+  bonusPredictions BonusPrediction[]
+  rankingEntry     RankingEntry?
+
+  @@index([email])
+  @@map("users")
+}
+
+model Group {
+  id      String  @id @default(cuid())
+  code    String  @unique
+  name    String
+  matches Match[]
+
+  @@map("groups")
+}
+
+model Team {
+  id        String  @id @default(cuid())
+  name      String
+  code      String  @unique
+  flagEmoji String
+  flagUrl   String?
+  groupId   String?
+
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+
+  @@map("teams")
+}
+
+model Match {
+  id             String       @id @default(cuid())
+  externalId     String?      @unique
+  phase          MatchPhase
+  round          String?
+  groupId        String?
+  homeTeamId     String
+  awayTeamId     String
+  homeScore      Int?
+  awayScore      Int?
+  result         MatchResult?
+  advancedTeamId String?
+  stadium        String?
+  city           String?
+  matchDate      DateTime
+  status         MatchStatus  @default(SCHEDULED)
+  isLocked       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  group       Group?       @relation(fields: [groupId], references: [id])
+  homeTeam    Team         @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam    Team         @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  predictions Prediction[]
+
+  @@index([phase, status])
+  @@index([matchDate])
+  @@map("matches")
+}
+
+model Prediction {
+  id        String         @id @default(cuid())
+  userId    String
+  matchId   String
+  pick      PredictionPick
+  points    Int            @default(0)
+  isCorrect Boolean?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id])
+  match Match @relation(fields: [matchId], references: [id])
+
+  @@unique([userId, matchId])
+  @@index([userId])
+  @@index([matchId])
+  @@map("predictions")
+}
+
+model BonusPrediction {
+  id         String    @id @default(cuid())
+  userId     String
+  type       BonusType
+  teamId     String?
+  playerName String?
+  points     Int       @default(0)
+  isCorrect  Boolean?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, type])
+  @@map("bonus_predictions")
+}
+
+model RankingEntry {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  totalPoints        Int      @default(0)
+  totalPredictions   Int      @default(0)
+  correctPredictions Int      @default(0)
+  groupPoints        Int      @default(0)
+  knockoutPoints     Int      @default(0)
+  bonusPoints        Int      @default(0)
+  position           Int?
+  previousPosition   Int?
+  accuracy           Float    @default(0)
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([totalPoints(sort: Desc)])
+  @@map("rankings")
+}
+
+model KnockoutSlot {
+  id          String  @id @default(cuid())
+  round       String
+  slotNumber  Int
+  teamId      String?
+  matchId     String?
+  sourceSlot1 Int?
+  sourceSlot2 Int?
+
+  @@unique([round, slotNumber])
+  @@map("knockout_slots")
+}
+
+model BolaoConfig {
+  id                 String    @id @default("default")
+  name               String
+  groupCorrectPts    Int       @default(3)
+  knockoutCorrectPts Int       @default(5)
+  championPts        Int       @default(20)
+  runnerUpPts        Int       @default(10)
+  thirdPlacePts      Int       @default(5)
+  topScorerPts       Int       @default(10)
+  bestPlayerPts      Int       @default(10)
+  isActive           Boolean   @default(true)
+  predictionDeadline DateTime?
+  bonusDeadline      DateTime?
+  updatedAt          DateTime  @updatedAt
+
+  @@map("bolao_config")
+}
