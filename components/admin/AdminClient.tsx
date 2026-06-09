@@ -37,15 +37,22 @@ export function AdminClient() {
   const [hovered, setHovered] = useState('')
   const [activeModal, setActiveModal] = useState('')
 
-  function act(key: string) {
-    if (key === 'result') {
-      setActiveModal('result')
-      return
-    }
-    setToast('⚙️ ' + MSGS[key])
-    setTimeout(() => setToast(''), 2800)
+  async function act(key: string) {
+  if (key === 'result') {
+    setActiveModal('result')
+    return
   }
-
+  if (key === 'sync') {
+    setToast('🔄 Sincronizando...')
+    const res = await fetch('/api/admin/sync', { method: 'POST' })
+    const data = await res.json()
+    setToast(data.success ? `✅ ${data.message}` : `❌ ${data.error}`)
+    setTimeout(() => setToast(''), 3000)
+    return
+  }
+  setToast('⚙️ ' + MSGS[key])
+  setTimeout(() => setToast(''), 2800)
+}
   return (
     <>
       {/* Toast */}
