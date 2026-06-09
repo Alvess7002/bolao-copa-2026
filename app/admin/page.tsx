@@ -1,10 +1,11 @@
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { AdminClient } from '@/components/admin/AdminClient'
 
 export default async function AdminPage() {
-  const session = await getServerSession()
+  const session = await getServerSession(authOptions)
 
   if (!session?.user?.email) {
     redirect('/login')
@@ -43,7 +44,6 @@ export default async function AdminPage() {
         🔒 Área restrita — logado como <strong style={{ color: '#fff' }}>{user.name ?? user.email}</strong> (Admin)
       </div>
 
-      {/* Stats */}
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
         gap: 10, marginBottom: 24,
