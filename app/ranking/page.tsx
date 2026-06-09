@@ -36,7 +36,7 @@ export default async function RankingPage() {
         ) : (
           rankings.map((r, i) => {
             const pos = i + 1
-            const initials = r.user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+            const initials = (r.user.name ?? 'U').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
             return (
               <div key={r.id} style={{
                 display: 'grid', gridTemplateColumns: '52px 1fr 80px 70px',
@@ -54,7 +54,7 @@ export default async function RankingPage() {
                     {initials}
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-100)' }}>{r.user.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-100)' }}>{r.user.name ?? 'Usuário'}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-400)' }}>{r.accuracy.toFixed(0)}% aproveitamento</div>
                   </div>
                 </div>
