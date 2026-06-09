@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { ResultadoForm } from './ResultadoForm'
 
 const ADMIN_ITEMS = [
   { icon: '👤', title: 'Gerenciar Usuários',    sub: 'Cadastrar, editar, suspender contas',  key: 'users'    },
   { icon: '⚽', title: 'Editar Partidas',        sub: 'Atualizar datas, horários e sedes',    key: 'matches'  },
-  { icon: '📊', title: 'Registrar Resultado',    sub: 'Inserir placar e classificado',        key: 'result'   },
+  { icon: '📊', title: 'Registrar Resultado',    sub: 'Inserir placar e calcular pontos',     key: 'result'   },
   { icon: '🔒', title: 'Fechar Palpites',        sub: 'Bloquear uma rodada manualmente',      key: 'lock'     },
   { icon: '🏆', title: 'Ajustar Pontuação',      sub: 'Correção manual de pontos',            key: 'adjust'   },
   { icon: '📥', title: 'Exportar CSV',           sub: 'Ranking e palpites em CSV',            key: 'csv'      },
@@ -18,31 +19,36 @@ const ADMIN_ITEMS = [
 ]
 
 const MSGS: Record<string, string> = {
-  users:    'Gerenciamento de usuários aberto',
-  matches:  'Editor de partidas carregado',
-  result:   'Formulário de resultado pronto',
-  lock:     'Rodada bloqueada com sucesso!',
-  adjust:   'Editor de pontuação disponível',
-  csv:      'Gerando CSV... Download em instantes',
-  excel:    'Gerando Excel XLSX...',
-  sync:     'Sincronizando com API Football...',
-  reports:  'Relatório gerado com sucesso',
-  notify:   'Notificação enviada para todos!',
-  validate: 'Auditoria de palpites iniciada',
-  config:   'Configurações do bolão abertas',
+  users:    'Gerenciamento de usuários — em breve',
+  matches:  'Editor de partidas — em breve',
+  lock:     'Fechar palpites — em breve',
+  adjust:   'Ajuste de pontuação — em breve',
+  csv:      'Exportar CSV — em breve',
+  excel:    'Exportar Excel — em breve',
+  sync:     'Sincronizar resultados — em breve',
+  reports:  'Relatórios — em breve',
+  notify:   'Notificações — em breve',
+  validate: 'Validar palpites — em breve',
+  config:   'Configurações — em breve',
 }
 
 export function AdminClient() {
   const [toast, setToast] = useState('')
   const [hovered, setHovered] = useState('')
+  const [activeModal, setActiveModal] = useState('')
 
   function act(key: string) {
+    if (key === 'result') {
+      setActiveModal('result')
+      return
+    }
     setToast('⚙️ ' + MSGS[key])
     setTimeout(() => setToast(''), 2800)
   }
 
   return (
     <>
+      {/* Toast */}
       {toast && (
         <div style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 999,
@@ -53,6 +59,24 @@ export function AdminClient() {
         }}>{toast}</div>
       )}
 
+      {/* Modal Registrar Resultado */}
+      {activeModal === 'result' && (
+        <div
+          onClick={() => setActiveModal('')}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 500,
+            background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 20,
+          }}
+        >
+          <div onClick={e => e.stopPropagation()}>
+            <ResultadoForm onClose={() => setActiveModal('')} />
+          </div>
+        </div>
+      )}
+
+      {/* Grid de botões */}
       <div style={{
         fontWeight: 900, fontSize: 14, letterSpacing: 2,
         color: 'var(--text-300)', marginBottom: 12, textTransform: 'uppercase',
@@ -72,8 +96,8 @@ export function AdminClient() {
             onMouseEnter={() => setHovered(item.key)}
             onMouseLeave={() => setHovered('')}
             style={{
-              background: 'var(--surface-1)',
-              border: `1px solid ${hovered === item.key ? 'var(--border-hover)' : 'var(--border)'}`,
+              background: item.key === 'result' ? 'rgba(201,168,76,0.08)' : 'var(--surface-1)',
+              border: `1px solid ${hovered === item.key || item.key === 'result' ? 'rgba(201,168,76,0.35)' : 'var(--border)'}`,
               borderRadius: 16, padding: '18px 16px', textAlign: 'left',
               cursor: 'pointer',
               transform: hovered === item.key ? 'translateY(-2px)' : 'none',
@@ -82,8 +106,17 @@ export function AdminClient() {
             }}
           >
             <div style={{ fontSize: 22 }}>{item.icon}</div>
-            <div style={{ fontWeight: 700, fontSize: 13, letterSpacing: 0.3, color: 'var(--text-100)' }}>{item.title}</div>
-            <div style={{ fontSize: 11, color: 'var(--text-400)', lineHeight: 1.4 }}>{item.sub}</div>
+            <div style={{ fontWeight: 700, fontSize: 13, letterSpacing: 0.3, color: 'var(--text-100)' }}>
+              {item.title}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-400)', lineHeight: 1.4 }}>
+              {item.sub}
+            </div>
+            {item.key === 'result' && (
+              <div style={{ fontSize: 10, color: 'var(--gold)', fontWeight: 700, letterSpacing: 0.5 }}>
+                ✓ DISPONÍVEL
+              </div>
+            )}
           </button>
         ))}
       </div>
