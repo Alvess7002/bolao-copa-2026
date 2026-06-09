@@ -4,11 +4,9 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
-
-// ===========================
-// ENUMS
-// ===========================
 
 enum AuthProvider {
   GOOGLE
@@ -59,22 +57,17 @@ enum BonusType {
   BEST_PLAYER
 }
 
-// ===========================
-// MODELS
-// ===========================
-
 model User {
-  id         String       @id @default(cuid())
-  email      String       @unique
-  name       String
-  image      String?
-  provider   AuthProvider @default(EMAIL)
-  providerId String?
-  role       Role         @default(USER)
-  isActive   Boolean      @default(true)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-
+  id               String            @id @default(cuid())
+  email            String            @unique
+  name             String
+  image            String?
+  provider         AuthProvider      @default(EMAIL)
+  providerId       String?
+  role             Role              @default(USER)
+  isActive         Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   predictions      Prediction[]
   bonusPredictions BonusPrediction[]
   rankingEntry     RankingEntry?
@@ -94,13 +87,12 @@ model Group {
 }
 
 model Team {
-  id        String  @id @default(cuid())
-  name      String
-  code      String  @unique
-  flagEmoji String
-  flagUrl   String?
-  groupId   String?
-
+  id          String  @id @default(cuid())
+  name        String
+  code        String  @unique
+  flagEmoji   String
+  flagUrl     String?
+  groupId     String?
   group       Group?  @relation(fields: [groupId], references: [id])
   homeMatches Match[] @relation("HomeTeam")
   awayMatches Match[] @relation("AwayTeam")
@@ -127,11 +119,10 @@ model Match {
   isLocked       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-
-  group       Group?       @relation(fields: [groupId], references: [id])
-  homeTeam    Team         @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam    Team         @relation("AwayTeam", fields: [awayTeamId], references: [id])
-  predictions Prediction[]
+  group          Group?       @relation(fields: [groupId], references: [id])
+  homeTeam       Team         @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam       Team         @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  predictions    Prediction[]
 
   @@index([phase, status])
   @@index([matchDate])
@@ -147,9 +138,8 @@ model Prediction {
   isCorrect Boolean?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
-
-  user  User  @relation(fields: [userId], references: [id])
-  match Match @relation(fields: [matchId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
+  match     Match          @relation(fields: [matchId], references: [id])
 
   @@unique([userId, matchId])
   @@index([userId])
@@ -167,8 +157,7 @@ model BonusPrediction {
   isCorrect  Boolean?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, type])
   @@map("bonus_predictions")
@@ -187,8 +176,7 @@ model RankingEntry {
   previousPosition   Int?
   accuracy           Float    @default(0)
   updatedAt          DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  user               User     @relation(fields: [userId], references: [id])
 
   @@index([totalPoints(sort: Desc)])
   @@map("rankings")
