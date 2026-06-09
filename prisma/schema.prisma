@@ -88,6 +88,7 @@ model Group {
   code    String  @unique
   name    String
   matches Match[]
+  teams   Team[]
 
   @@map("groups")
 }
@@ -100,6 +101,7 @@ model Team {
   flagUrl   String?
   groupId   String?
 
+  group       Group?  @relation(fields: [groupId], references: [id])
   homeMatches Match[] @relation("HomeTeam")
   awayMatches Match[] @relation("AwayTeam")
 
