@@ -158,7 +158,7 @@ export default async function DashboardPage() {
               </div>
             ) : (
               topRanking.map((r, i) => {
-                const initials = r.user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+                const initials = (r.user.name ?? 'U').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
                 return (
                   <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                     <span style={{ fontWeight: 900, fontSize: 18, minWidth: 28, textAlign: 'center', color: i < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][i] : 'var(--text-400)' }}>
@@ -168,7 +168,7 @@ export default async function DashboardPage() {
                       {initials}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 500 }}>{r.user.name}</div>
+                      <div style={{ fontSize: 13, fontWeight: 500 }}>{r.user.name ?? 'Usuário'}</div>
                       <div style={{ fontSize: 10, color: 'var(--text-400)' }}>{r.correctPredictions} acertos</div>
                     </div>
                     <div style={{ fontWeight: 900, fontSize: 20, color: 'var(--gold)' }}>{r.totalPoints}</div>
