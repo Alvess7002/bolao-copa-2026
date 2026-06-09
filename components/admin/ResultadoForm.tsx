@@ -16,7 +16,7 @@ type Match = {
   status: string
 }
 
-export function ResultadoForm() {
+export function ResultadoForm({ onClose }: { onClose: () => void }) {
   const [matches, setMatches] = useState<Match[]>([])
   const [selected, setSelected] = useState('')
   const [homeScore, setHomeScore] = useState('')
