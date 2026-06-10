@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/lock-matches?secret=bolao2026cron",
+      "schedule": "* * * * *"
+    }
+  ]
+}
