@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
+import { NavPoints } from './NavPoints'
 
 const tabs = [
   { href: '/',            label: 'Início',      icon: '🏠' },
@@ -87,12 +88,7 @@ export function Navbar() {
         {/* Auth */}
         {session ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-100)' }}>
-                {session.user?.name?.split(' ')[0]}
-              </div>
-              <div style={{ fontSize: 10, color: 'var(--text-400)' }}>0 pts</div>
-            </div>
+            <NavPoints />
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               <div
                 style={{
@@ -111,8 +107,7 @@ export function Navbar() {
                 style={{
                   background: 'transparent', border: 'none',
                   fontSize: 10, color: 'var(--text-400)',
-                  cursor: 'pointer', letterSpacing: 0.5,
-                  padding: 0,
+                  cursor: 'pointer', letterSpacing: 0.5, padding: 0,
                 }}
               >
                 sair

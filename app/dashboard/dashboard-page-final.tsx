@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { CountdownClient } from '@/components/layout/CountdownClient'
+import { StatsReal } from '@/components/dashboard/StatsReal'
 import Link from 'next/link'
 
 export default async function DashboardPage() {
@@ -74,13 +75,15 @@ export default async function DashboardPage() {
         <CountdownClient targetDate="2026-06-11T19:00:00Z" />
       </div>
 
-      {/* STATS */}
+      {/* STATS REAIS DO USUÁRIO */}
+      <StatsReal />
+
+      {/* STATS GERAIS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 24 }}>
         {[
-          { label: 'Jogos',        value: matchCount,  sub: 'fase de grupos'    },
-          { label: 'Seleções',     value: teamCount,   sub: '48 países'         },
-          { label: 'Participantes',value: rankingCount, sub: 'no bolão'         },
-          { label: 'Meus Pontos',  value: 0,           sub: 'acumulados'        },
+          { label: 'Jogos',         value: matchCount,   sub: 'fase de grupos' },
+          { label: 'Seleções',      value: teamCount,    sub: '48 países'      },
+          { label: 'Participantes', value: rankingCount, sub: 'no bolão'       },
         ].map(s => (
           <div key={s.label} style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 14px' }}>
             <div style={{ fontSize: 10, color: 'var(--text-400)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 }}>{s.label}</div>
@@ -113,7 +116,7 @@ export default async function DashboardPage() {
           </div>
           {nextMatches.length === 0 ? (
             <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 12, padding: 20, textAlign: 'center', color: 'var(--text-400)', fontSize: 13 }}>
-              Nenhum jogo agendado.<br />Rode o seed para popular o banco.
+              Nenhum jogo agendado.
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -154,7 +157,7 @@ export default async function DashboardPage() {
           <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden' }}>
             {topRanking.length === 0 ? (
               <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-400)', fontSize: 13 }}>
-                Ranking vazio.<br />Será preenchido após os primeiros resultados.
+                Ranking vazio. Será preenchido após os primeiros resultados.
               </div>
             ) : (
               topRanking.map((r, i) => {
@@ -169,7 +172,7 @@ export default async function DashboardPage() {
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 500 }}>{r.user.name ?? 'Usuário'}</div>
-                      <div style={{ fontSize: 10, color: 'var(--text-400)' }}>{r.correctPredictions} acertos</div>
+                      <div style={{ fontSize: 10, color: 'var(--text-400)' }}>{r.correctPredictions} acertos · {r.accuracy.toFixed(0)}%</div>
                     </div>
                     <div style={{ fontWeight: 900, fontSize: 20, color: 'var(--gold)' }}>{r.totalPoints}</div>
                   </div>
