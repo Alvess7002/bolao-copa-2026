@@ -14,6 +14,7 @@ const tabs = [
   { href: '/bonus',       label: 'Bônus',       icon: '⭐' },
   { href: '/regras',      label: 'Regras',      icon: '📋' },
   { href: '/admin',       label: 'Admin',       icon: '⚙️' },
+  { href: '/perfil', label: 'Perfil', icon: '👤' },
 ]
 
 export function Navbar() {
